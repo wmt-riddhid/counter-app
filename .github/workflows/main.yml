@@ -1,62 +1,57 @@
-name: COUNTER-APP
+name: Build & deploy
 
 on:
   push:
     branches:
-     - master
-  
+      - master
   pull_request:
     branches:
       - master
-  
 
 jobs:
-
   build:
-    name: build
+    name: Build
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: chackout code
+    - name: Checkout code
       uses: actions/checkout@v2
     
-    - name: install node.js
+    - name: Install Node.js
       uses: actions/setup-node@v1
       with:
-        node-version: '16'
+        node-version: 13.x
     
-    - name: install npm packages
+    - name: Install NPM packages
       run: npm ci
-
-    - name: build project
+    
+    - name: Build project
       run: npm run build
+    
+#    - name: Run tests
+ #     run: npm run test
 
-    - name: run tests
-      run: npm run test
-
-    - name: upload production
+    - name: Upload production-ready build files
       uses: actions/upload-artifact@v2
       with:
-        name: production-file
+        name: production-files
         path: ./build
-
+  
   deploy:
-    name: deploy
+    name: Deploy
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-
+    
     steps:
-
-    - name: download articals
+    - name: Download artifact
       uses: actions/download-artifact@v2
       with:
-        name: production-file
+        name: production-files
         path: ./build
-    
+
     - name: Deploy to gh-pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./build
-
