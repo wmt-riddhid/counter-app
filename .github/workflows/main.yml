@@ -59,13 +59,6 @@ jobs:
       with:
         NETLIFY_AUTH_TOKEN: ${{ secrets.MY_NETLIFY_AUTH_TOKEN }}
         NETLIFY_SITE_ID: ${{secrets.DEV_NETLIFY_SITE_ID}}
+        build_command: "echo hello" 
+        install_command: "echo hello"
         NETLIFY_DEPLOY_TO_PROD: true
-        steps:
-        - run: npm install -g netlify-cli 
-        - run: netlify deploy --dir=build --prod
-
-  #   - name: deploy to gh-pages
-  #     uses: peaceiris/actions-gh-pages@v3
-  #     with: 
-  #       github_token: ${{ secrets.GITHUB_TOKEN }}
-  #       publish_dir: ./build
