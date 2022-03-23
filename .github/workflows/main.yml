@@ -22,7 +22,7 @@ uses: actions/setup-node@v1
 with:
 node-version: 13.x
 
-# - name: Install NPM packages
+- name: Install NPM packages
 - run: npm install
 - run: npm run build --if-present
 
@@ -56,14 +56,14 @@ steps:
     name: production-files
     path: ./build
 
-#- name: Deploy to gh-pages
-# uses: peaceiris/actions-gh-pages@v3
+- name: Deploy to gh-pages
+uses: peaceiris/actions-gh-pages@v3
 
-# - name: Deploy to Netlify
-# uses: 
-# with:
-# github_token: ${{ secrets.GITHUB_TOKEN }}
-# publish_dir: ./build
+- name: Deploy to Netlify
+uses: 
+with:
+  github_token: ${{ secrets.GITHUB_TOKEN }}
+  publish_dir: ./build
 
 actions:
 - action: "Deploy"
