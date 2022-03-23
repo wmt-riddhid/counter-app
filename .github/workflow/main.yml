@@ -1,7 +1,7 @@
 actions:
-- action: "Deploy to application-42707"
+- action: "Deploy"
   type: "NETLIFY"
-  application_name: "application-42707"
+  application_name: "COUNTER-APP"
   site_id: "2a3ee62a-3300-4039-a6f9-a7b8cd2fb564"
   setup_commands:
   - "apt-get update && apt-get -y install git"
