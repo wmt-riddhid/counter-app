@@ -1,81 +1,68 @@
+name: COUNTER-APP
+
 on:
   push:
-   branches:
+    branches:
      - master
-pull_request:
-branches:
-- dev
+  
+  pull_request:
+    branches:
+      - master
+  
 
 jobs:
-deploy:
-runs-on: Ubuntu-latest
-build:
-  name: Build
-  runs-on: Ubuntu-latest
 
-steps:
-- name: Checkout code
-uses: actions/checkout@v2
+  build:
+    name: build
+    runs-on: ubuntu-latest
 
-- name: Use Node.js
-uses: actions/setup-node@v1
-with:
-node-version: 13.x
+    steps:
+    - name: chackout code
+      uses: actions/checkout@v2
+    
+    - name: install node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16
+    
+    - name: install npm packages
+      run: npm ci
 
-- name: Install NPM packages
-- run: npm install
-- run: npm run build --if-present
+    - name: build project
+      run: npm run build
 
-- name: Deploy to Netlify
-  run: npm run build
-uses: netlify/actions/cli@master
-env:
-NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-NETLIFY_SITE_ID: ${{ secrets.DEV_NETLIFY_SITE_ID }}
-with:
-args: deploy --dir=build --prod
-secrets: '["DEV_NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
-- name: Run tests
-  run: npm run test
+    - name: run tests
+      run: npm run test
 
-- name: Uplode production-ready build files
-  uses: actions/uplode-artifact@v2
-with:
-  name: production-files
-  path: ./build
-deploy:
-  name: Deploy
-  needs: build
-  runs-on: Ubuntu-latest
-if: github.ref == 'refs/heads/master'
+    - name: upload production
+      uses: actions/upload-artifact@v2
+      with:
+        name: production-file
+        path: ./build
 
-steps:
-  - name: Download artifact
-  uses: actions/download-artifact@v2
-  with:
-    name: production-files
-    path: ./build
+  deploy:
+    name: deploy
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
 
-- name: Deploy to gh-pages
-uses: peaceiris/actions-gh-pages@v3
+    steps:
 
-- name: Deploy to Netlify
-uses: 
-with:
-  github_token: ${{ secrets.GITHUB_TOKEN }}
-  publish_dir: ./build
+    - name: download articals
+      uses: actions/download-artifact@v2
+      with:
+        name: production-file
+        path: ./build
 
-actions:
-- action: "Deploy"
-  type: "NETLIFY"
-  application_name: "COUNTER-APP"
-  site_id: "2a3ee62a-3300-4039-a6f9-a7b8cd2fb564"
-  setup_commands:
-  - "apt-get update && apt-get -y install git"
-  execute_commands:
-  - "netlify deploy --dir=$netlify_dir"
-  integration_hash: "5ddb7c180fb38be67bd78a88a"
-  shell: "SH"
-  variables:
-  - key: "netlify_dir",
-  value: "directory_name"
+    - name: Deploy to Netlify
+      uses: jsmrcaga/action-netlify-deploy@v1.1.0
+      with:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.MY_NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{secrets.DEV_NETLIFY_SITE_ID}}
+        NETLIFY_DEPLOY_TO_PROD: true
+
+  #   - name: deploy to gh-pages
+  #     uses: peaceiris/actions-gh-pages@v3
+  #     with: 
+  #       github_token: ${{ secrets.GITHUB_TOKEN }}
+  #       publish_dir: ./build
